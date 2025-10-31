@@ -1,0 +1,195 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Filtrar Reservas - Panel de Residente</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/administrador/reservas/filtro_reservas.css' %}">
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+<body>
+
+    <!-- Alertas -->
+    {% if messages %}
+    <div class="alerts-container">
+        {% for message in messages %}
+            <div class="alert-modern alert-{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %} fade show" role="alert">
+                {% if message.tags == "success" %}
+                    <i class="fas fa-check-circle"></i>
+                {% elif message.tags == "error" %}
+                    <i class="fas fa-times-circle"></i>
+                {% else %}
+                    <i class="fas fa-info-circle"></i>
+                {% endif %}
+                <div>{{ message }}</div>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% endif %}
+
+    <!-- Botón móvil -->
+    <button class="mobile-toggle" id="toggleSidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Overlay para móvil -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+   <nav id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <img src="{% static 'img/Logo Fontibon.png' %}" alt="Logo" class="logo-img">
+                <div class="logo-text">Panel Administrativo</div>
+            </div>
+        </div>
+
+        <div class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Gestión</div>
+                <a href="{% url 'panel_administrador' %}" class="nav-item ">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </a>
+                <a href="{% url 'gestionar_usuarios' %}" class="nav-item">
+                    <i class="fas fa-users-cog"></i>
+                    <span>Usuarios</span>
+                </a>
+                <a href="{% url 'gestionar_reservas' %}" class="nav-item">
+                    <i class="fas fa-tasks"></i>
+                    <span>Reservas</span>
+                </a>
+                <a href="{% url 'listar_noticias' %}" class="nav-item">
+                    <i class="fas fa-newspaper"></i>
+                    <span>Noticias</span>
+                </a>
+                <a href="{% url 'lista_vehiculos' %}" class="nav-item">
+                    <i class="fas fa-car"></i>
+                    <span>Vehículos</span>
+                </a>
+                <a href="{% url 'sorteos_list_create' %}" class="nav-item">
+                    <i class="fas fa-gift"></i>
+                    <span>Sorteos</span>
+                </a>
+
+                <a href="{% url 'listar_novedades' %}" class="nav-item">
+                    <i class="fas fa-bell"></i>
+                    <span>Novedades</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-name">Usuario Actual</div>
+                <div class="user-role">Administrador</div>
+            </div>
+            <a href="{% url 'perfil_usuario' %}" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Mi Perfil</span>
+            </a>
+            <a href="{% url 'logout' %}" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="main-content" id="mainContent">
+        <div class="content-header">
+            <h1 class="page-title">
+                <i class="fas fa-filter"></i>
+                Filtrar Reservas
+            </h1>
+        </div>
+
+        <div class="content-body">
+            <a href="{% url 'gestionar_reservas' %}" class="back-link">
+                <i class="fas fa-arrow-left me-2"></i>
+                Volver a Reservas
+            </a>
+
+            <div class="filter-header">
+                <h2>Seleccione el tipo de filtro para generar el reporte</h2>
+                <p class="text-muted">El reporte se generará en formato PDF con los criterios seleccionados</p>
+            </div>
+
+            <div class="row g-4">
+                <!-- Fecha específica -->
+                <div class="col-md-4">
+                    <div class="filter-card">
+                        <i class="fas fa-calendar-day filter-icon"></i>
+                        <h5>Fecha específica</h5>
+                        <form method="get" action="{% url 'reporte_reservas_pdf' %}" target="_blank" class="filter-form">
+                            <input type="date" name="fecha" class="form-control">
+                            <select name="estado" class="form-select">
+                                <option value="">Todos los estados</option>
+                                <option value="Aprobada">Aprobada</option>
+                                <option value="Rechazada">Rechazada</option>
+                                <option value="En espera">En espera</option>
+                            </select>
+                            <button type="submit" class="filter-btn mt-3">Generar PDF</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Mes -->
+                <div class="col-md-4">
+                    <div class="filter-card">
+                        <i class="fas fa-calendar-alt filter-icon"></i>
+                        <h5>Mes</h5>
+                        <form method="get" action="{% url 'reporte_reservas_pdf' %}" target="_blank" class="filter-form">
+                            <input type="number" name="mes" placeholder="Mes (1-12)" class="form-control" min="1" max="12">
+                            <input type="number" name="anio" placeholder="Año" class="form-control" min="1">
+                            <select name="estado" class="form-select">
+                                <option value="">Todos los estados</option>
+                                <option value="Aprobada">Aprobada</option>
+                                <option value="Rechazada">Rechazada</option>
+                                <option value="En espera">En espera</option>
+                            </select>
+                            <button type="submit" class="filter-btn mt-3">Generar PDF</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Año -->
+                <div class="col-md-4">
+                    <div class="filter-card">
+                        <i class="fas fa-calendar filter-icon"></i>
+                        <h5>Año</h5>
+                        <form method="get" action="{% url 'reporte_reservas_pdf' %}" target="_blank" class="filter-form">
+                            <input type="number" name="anio" placeholder="Año" class="form-control" min="1">
+                            <select name="estado" class="form-select">
+                                <option value="">Todos los estados</option>
+                                <option value="Aprobada">Aprobada</option>
+                                <option value="Rechazada">Rechazada</option>
+                                <option value="En espera">En espera</option>
+                            </select>
+                            <button type="submit" class="filter-btn mt-3">Generar PDF</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/administrador/reservas/filtro_reservas.js' %}"></script>
+
+</body>
+</html>

@@ -1,0 +1,56 @@
+<table class="table table-hover mb-0">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Nombre Completo</th>
+            <th>Correo</th>
+            <th>Celular</th>
+            <th>Rol Actual</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for usuario in usuarios %}
+        <tr>
+            <td><strong>{{ forloop.counter }}</strong></td>
+            <td>{{ usuario.nombres }} {{ usuario.apellidos }}</td>
+            <td>{{ usuario.correo }}</td>
+            <td>{{ usuario.celular }}</td>
+            <td>
+                {% if usuario.id_rol.nombre_rol == "Admin" %}
+                    <span class="role-badge badge-admin"><i class="fas fa-crown"></i> {{ usuario.id_rol.nombre_rol }}</span>
+                {% elif usuario.id_rol.nombre_rol == "Usuario" %}
+                    <span class="role-badge badge-usuario"><i class="fas fa-user"></i> {{ usuario.id_rol.nombre_rol }}</span>
+                {% elif usuario.id_rol.nombre_rol == "Vigilante" %}
+                    <span class="role-badge badge-editor"><i class="fas fa-edit"></i> {{ usuario.id_rol.nombre_rol }}</span>
+                {% else %}
+                    <span class="role-badge badge-otro"><i class="fas fa-user-tag"></i> {{ usuario.id_rol.nombre_rol }}</span>
+                {% endif %}
+            </td>
+            <td>
+                <form method="post" class="role-form" data-user-id="{{ usuario.id_usuario }}" data-user-name="{{ usuario.nombres }} {{ usuario.apellidos }}">
+                    {% csrf_token %}
+                    <input type="hidden" name="usuario_id" value="{{ usuario.id_usuario }}">
+                    <select name="id_rol" class="form-select-modern">
+                        {% for rol in roles %}
+                            <option value="{{ rol.id_rol }}" {% if rol.id_rol == usuario.id_rol.id_rol %}selected{% endif %}>{{ rol.nombre_rol }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" class="btn-modern change-role-btn">
+                        <i class="fas fa-sync-alt"></i> Cambiar
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6">
+                <div class="empty-state">
+                    <i class="fas fa-users"></i>
+                    <div>No se encontraron usuarios.</div>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

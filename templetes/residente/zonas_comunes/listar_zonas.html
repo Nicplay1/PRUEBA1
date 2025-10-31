@@ -1,0 +1,155 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reservar Zona</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/residente/zonas_comunes/listar_zonas.css' %}">
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- FullCalendar -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales/es.global.min.js"></script>
+
+
+</head>
+<body>
+
+    <!-- Alertas -->
+    {% if messages %}
+    <div class="alerts-container">
+        {% for message in messages %}
+            <div class="alert-modern alert-{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %} fade show" role="alert">
+                {% if message.tags == "success" %}
+                    <i class="fas fa-check-circle"></i>
+                {% elif message.tags == "error" %}
+                    <i class="fas fa-times-circle"></i>
+                {% else %}
+                    <i class="fas fa-info-circle"></i>
+                {% endif %}
+                <div>{{ message }}</div>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Botón móvil -->
+    <button class="mobile-toggle" id="toggleSidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Overlay para móvil -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <img src="{% static 'img/Logo Fontibon.png' %}" alt="Logo" class="logo-img">
+                <div class="logo-text">Panel Residente</div>
+            </div>
+        </div>
+
+        <div class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Navegación</div>
+
+                <a href="{% url 'panel_residente' %}" class="nav-item ">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </a>
+                <a href="{% url 'noticias' %}" class="nav-item ">
+                    <i class="fas fa-newspaper"></i>
+                    <span>Noticias</span>
+                </a>
+                <a href="{% url 'listar_zonas' %}" class="nav-item active">
+                    <i class="fas fa-building"></i>
+                    <span>Zonas</span>
+                </a>
+                <a href="{% url 'mis_reservas' %}" class="nav-item">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Reservas</span>
+                </a>
+                <a href="{% url 'lista_sorteos' %}" class="nav-item ">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Sorteos</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-name">Usuario Actual</div>
+                <div class="user-role">Residente</div>
+            </div>
+            <a href="{% url 'perfil_usuario' %}" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Mi Perfil</span>
+            </a>
+            <a href="{% url 'logout' %}" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="main-content" id="mainContent">
+        <div class="content-header">
+            <h1 class="page-title">
+                <i class="fas fa-building"></i>
+                Zonas Comunes Disponibles
+            </h1>
+        </div>
+
+        <div class="content-body">
+            <div class="zona-grid">
+                {% for zona in zonas %}
+                <div class="zona-card">
+                    <h3 class="zona-title">
+                        <i class="fas fa-map-marker-alt"></i> {{ zona.nombre_zona }}
+                    </h3>
+                    <div class="zona-details">
+                        <p><strong>Capacidad:</strong> {{ zona.capacidad }} personas</p>
+                        <p><strong>Tipo de pago:</strong> {{ zona.tipo_pago }}</p>
+                        <p>
+                            <strong>Estado:</strong> 
+                            <span class="zona-status {% if zona.estado %}status-available{% else %}status-unavailable{% endif %}">
+                                <i class="fas {% if zona.estado %}fa-check-circle{% else %}fa-times-circle{% endif %}"></i>
+                                {% if zona.estado %}Disponible{% else %}No Disponible{% endif %}
+                            </span>
+                        </p>
+                    </div>
+                    {% if zona.estado %}
+                        <a href="{% url 'crear_reserva' zona.id_zona %}" class="btn-modern w-full text-center justify-center">
+                            <i class="fas fa-calendar-plus"></i> Reservar
+                        </a>
+                    {% endif %}
+                </div>
+                {% empty %}
+                <div class="empty-state">
+                    <i class="fas fa-building"></i>
+                    <div>No hay zonas comunes registradas.</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/residente/zonas_comunes/listar_zonas.js' %}"></script>
+</body>
+</html>

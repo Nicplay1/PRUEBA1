@@ -1,0 +1,151 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Vigilante</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!--link de css-->
+   <link rel="stylesheet" href="{% static 'css/vigilante/panel.css' %}">
+</head>
+<body>
+
+
+
+    <!-- Alertas -->
+    {% if messages %}
+    <div class="alerts-container">
+        {% for message in messages %}
+            <div class="alert-modern alert-{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %} fade show" role="alert">
+                {% if message.tags == "success" %}
+                    <i class="fas fa-check-circle"></i>
+                {% elif message.tags == "error" %}
+                    <i class="fas fa-times-circle"></i>
+                {% else %}
+                    <i class="fas fa-info-circle"></i>
+                {% endif %}
+                <div>{{ message }}</div>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% endif %}
+
+    <!-- Botón móvil -->
+    <button class="mobile-toggle" id="toggleSidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Overlay para móvil -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <img src="{% static 'img/Logo Fontibon.png' %}" alt="Logo" class="logo-img">
+                <div class="logo-text">Panel Vigilante</div>
+            </div>
+        </div>
+
+        <div class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Navegación</div>
+
+                <a href="{% url 'panel_vigilante' %}" class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </a>
+                <a href="{% url 'registrar_detalle_parqueadero' %}" class="nav-item">
+                    <i class="fas fa-parking"></i>
+                    <span>Parqueadero</span>
+                </a>
+                <a href="{% url 'correspondencia' %}" class="nav-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>Correspondencia</span>
+                </a>
+                <a href="{% url 'novedades' %}" class="nav-item">
+                    <i class="fas fa-bell"></i>
+                    <span>Novedades</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-name">Usuario Actual</div>
+                <div class="user-role">Vigilante</div>
+            </div>
+            <a href="{% url 'perfil_usuario' %}" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Mi Perfil</span>
+            </a>
+            <a href="{% url 'logout' %}" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="main-content" id="mainContent">
+        <div class="content-header">
+            <h1 class="page-title">
+                <i class="fas fa-shield-alt"></i>
+                Panel de Vigilante
+            </h1>
+        </div>
+
+        <div class="content-body">
+            <div class="welcome-message">
+                <h1 class="welcome-title">Bienvenido Vigilante</h1>
+                <p class="welcome-subtitle">Desde este panel podrás gestionar el control de acceso, registro de vehículos, correspondencia y novedades del conjunto residencial.</p>
+            </div>
+
+            <div class="feature-cards">
+                <a href="{% url 'registrar_detalle_parqueadero' %}" class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-parking"></i>
+                    </div>
+                    <h3 class="feature-title">Control de Parqueadero</h3>
+                    <p class="feature-description">Registra y gestiona el acceso de vehículos al parqueadero del conjunto.</p>
+                </a>
+
+                <a href="{% url 'correspondencia' %}" class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3 class="feature-title">Correspondencia</h3>
+                    <p class="feature-description">Registra la entrada y salida de correspondencia y paquetes.</p>
+                </a>
+
+                <a href="{% url 'novedades' %}" class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3 class="feature-title">Registro de Novedades</h3>
+                    <p class="feature-description">Reporta y lleva un control de las novedades e incidencias.</p>
+                </a>
+
+                
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/vigilante/panel.js' %}"></script>
+    
+
+</body>
+</html>

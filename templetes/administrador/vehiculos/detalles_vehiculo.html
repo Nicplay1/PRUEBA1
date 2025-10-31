@@ -1,0 +1,279 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Documentación Vehículo - Panel de Administrador</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/administrador/vehiculos/detalles_vehiculo.css' %}">
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Alertas -->
+    {% if messages %}
+    <div class="alerts-container">
+        {% for message in messages %}
+            <div class="alert-modern alert-{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %} fade show" role="alert">
+                {% if message.tags == "success" %}
+                    <i class="fas fa-check-circle"></i>
+                {% elif message.tags == "error" %}
+                    <i class="fas fa-times-circle"></i>
+                {% else %}
+                    <i class="fas fa-info-circle"></i>
+                {% endif %}
+                <div>{{ message }}</div>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Botón móvil -->
+    <button class="mobile-toggle" id="toggleSidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Overlay para móvil -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <img src="{% static 'img/Logo Fontibon.png' %}" alt="Logo" class="logo-img">
+                <div class="logo-text">Panel Administrativo</div>
+            </div>
+        </div>
+
+        <div class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Gestión</div>
+                <a href="{% url 'panel_administrador' %}" class="nav-item ">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </a>
+                <a href="{% url 'gestionar_usuarios' %}" class="nav-item">
+                    <i class="fas fa-users-cog"></i>
+                    <span>Usuarios</span>
+                </a>
+                <a href="{% url 'gestionar_reservas' %}" class="nav-item">
+                    <i class="fas fa-tasks"></i>
+                    <span>Reservas</span>
+                </a>
+                <a href="{% url 'listar_noticias' %}" class="nav-item">
+                    <i class="fas fa-newspaper"></i>
+                    <span>Noticias</span>
+                </a>
+                <a href="{% url 'lista_vehiculos' %}" class="nav-item">
+                    <i class="fas fa-car"></i>
+                    <span>Vehículos</span>
+                </a>
+                <a href="{% url 'sorteos_list_create' %}" class="nav-item">
+                    <i class="fas fa-gift"></i>
+                    <span>Sorteos</span>
+                </a>
+
+                <a href="{% url 'listar_novedades' %}" class="nav-item">
+                    <i class="fas fa-bell"></i>
+                    <span>Novedades</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-name">Usuario Actual</div>
+                <div class="user-role">Administrador</div>
+            </div>
+            <a href="{% url 'perfil_usuario' %}" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Mi Perfil</span>
+            </a>
+            <a href="{% url 'logout' %}" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="main-content" id="mainContent">
+        <div class="content-header">
+            <h1 class="page-title">
+                <i class="fas fa-car"></i>
+                Documentación Vehículo: {{ vehiculo.placa }}
+            </h1>
+        </div>
+
+        <div class="content-body">
+            <a href="{% url 'lista_vehiculos' %}" class="back-link">
+                <i class="fas fa-arrow-left me-2"></i>
+                Volver a Vehículos
+            </a>
+
+            <!-- Estado del proceso -->
+            {% if proceso_activo %}
+            <div class="alert-modern alert-info">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>Proceso de validación activo</strong> - Los vehículos con documentos completos se marcarán automáticamente.
+                </div>
+            </div>
+            {% else %}
+            <div class="alert-modern alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div>
+                    <strong>Proceso de validación inactivo</strong> - La validación automática está desactivada.
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Resumen de documentos -->
+            <div class="content-card">
+                <h3 class="card-title">
+                    <i class="fas fa-clipboard-check"></i> Estado de Documentos
+                </h3>
+                
+                <div class="document-status">
+                    <div class="status-item">
+                        <span class="status-label">Documentos completos:</span>
+                        <span class="status-value {% if tiene_todos_documentos %}status-complete{% else %}status-incomplete{% endif %}">
+                            {% if tiene_todos_documentos %}
+                                <i class="fas fa-check-circle"></i> COMPLETOS
+                            {% else %}
+                                <i class="fas fa-times-circle"></i> INCOMPLETOS
+                            {% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="status-item">
+                        <span class="status-label">Documentos subidos:</span>
+                        <span class="status-value">
+                            {{ documentos_subidos|length }} de {{ documentos_requeridos|length }}
+                        </span>
+                    </div>
+                    
+                    <div class="document-list">
+                        <h6>Documentos requeridos:</h6>
+                        <ul>
+                            {% for doc in documentos_requeridos %}
+                            <li class="{% if doc in documentos_subidos %}text-success{% else %}text-danger{% endif %}">
+                                <i class="fas {% if doc in documentos_subidos %}fa-check{% else %}fa-times{% endif %} me-2"></i>
+                                {{ doc }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Archivos del vehículo -->
+            <div class="content-card">
+                <h3 class="card-title">
+                    <i class="fas fa-file-alt"></i> Archivos del Vehículo
+                </h3>
+                
+                {% if archivos %}
+                    <div class="table-responsive">
+                        <table class="table-modern">
+                            <thead>
+                                <tr>
+                                    <th>Tipo de Documento</th>
+                                    <th>Archivo</th>
+                                    <th>Fecha de Vencimiento</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for archivo in archivos %}
+                                <tr>
+                                    <td>{{ archivo.idTipoArchivo.tipo_documento }}</td>
+                                    <td>
+                                        <a href="{{ archivo.archivo.url }}" target="_blank" class="btn-modern btn-sm">
+                                            <i class="fas fa-eye"></i> Ver Archivo
+                                        </a>
+                                    </td>
+                                    <td>{{ archivo.fechaVencimiento|default:"No especificada" }}</td>
+                                    <td>
+                                        <span class="badge {% if archivo.idTipoArchivo.tipo_documento in documentos_subidos %}bg-success{% else %}bg-secondary{% endif %}">
+                                            {% if archivo.idTipoArchivo.tipo_documento in documentos_subidos %}Subido{% else %}Faltante{% endif %}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-file-alt"></i>
+                        <div>No hay archivos para este vehículo</div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Formulario de actualización -->
+            <div class="content-card">
+    <h3 class="card-title">
+        <i class="fas fa-edit"></i> Validación Manual de Documentos
+    </h3>
+    
+    <!-- Alertas informativas -->
+    {% if proceso_activo %}
+    <div class="alert-modern alert-info">
+        <i class="fas fa-info-circle"></i>
+        <div>
+            <strong>Proceso activo:</strong> La validación automática está activada, pero su elección manual tiene prioridad.
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if tiene_todos_documentos and not vehiculo.documentos %}
+    <div class="alert-modern alert-warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div>
+            <strong>Nota:</strong> Este vehículo tiene todos los documentos requeridos, pero está marcado como no validado por decisión manual.
+        </div>
+    </div>
+    {% endif %}
+    
+    <form method="POST" class="mb-4">
+        {% csrf_token %}
+        <div class="form-group">
+            <div class="form-check form-switch">
+                {{ form.documentos }}
+                <label class="form-check-label" for="id_documentos">
+                    <strong>Documentación validada</strong>
+                </label>
+            </div>
+            {% if form.documentos.help_text %}
+            <div class="form-text text-muted">
+                {{ form.documentos.help_text }}
+            </div>
+            {% endif %}
+        </div>
+        <div class="d-flex gap-2 mt-3">
+            <button type="submit" class="btn-modern">
+                <i class="fas fa-save"></i> Guardar Estado Manual
+            </button>
+        </div>
+    </form>
+</div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/administrador/vehiculos/detalles_vehiculo.js' %}"></script>
+</body>
+</html>

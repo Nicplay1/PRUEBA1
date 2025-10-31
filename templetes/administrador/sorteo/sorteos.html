@@ -1,0 +1,224 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Sorteos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/administrador/sorteo/sorteos.css' %}">
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+<body>
+
+    <!-- Alertas -->
+    {% if messages %}
+    <div class="alerts-container">
+        {% for message in messages %}
+            <div class="alert-modern alert-{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %} fade show" role="alert">
+                {% if message.tags == "success" %}
+                    <i class="fas fa-check-circle"></i>
+                {% elif message.tags == "error" %}
+                    <i class="fas fa-times-circle"></i>
+                {% else %}
+                    <i class="fas fa-info-circle"></i>
+                {% endif %}
+                <div>{{ message }}</div>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Botón móvil -->
+    <button class="mobile-toggle" id="toggleSidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Overlay para móvil -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Overlay para modales -->
+    <div id="overlay" onclick="closeAllModals()"></div>
+
+    <!-- Sidebar -->
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <img src="{% static 'img/Logo Fontibon.png' %}" alt="Logo" class="logo-img">
+                <div class="logo-text">Panel Administrativo</div>
+            </div>
+        </div>
+
+        <div class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Gestión</div>
+                <a href="{% url 'panel_administrador' %}" class="nav-item">
+                    <i class="fas fa-home"></i> <span>Inicio</span>
+                </a>
+                <a href="{% url 'gestionar_usuarios' %}" class="nav-item">
+                    <i class="fas fa-users-cog"></i> <span>Usuarios</span>
+                </a>
+                <a href="{% url 'gestionar_reservas' %}" class="nav-item">
+                    <i class="fas fa-tasks"></i> <span>Reservas</span>
+                </a>
+                <a href="{% url 'listar_noticias' %}" class="nav-item">
+                    <i class="fas fa-newspaper"></i> <span>Noticias</span>
+                </a>
+                <a href="{% url 'lista_vehiculos' %}" class="nav-item">
+                    <i class="fas fa-car"></i> <span>Vehículos</span>
+                </a>
+                <a href="{% url 'sorteos_list_create' %}" class="nav-item active">
+                    <i class="fas fa-gift"></i> <span>Sorteos</span>
+                </a>
+                <a href="{% url 'listar_novedades' %}" class="nav-item">
+                    <i class="fas fa-bell"></i> <span>Novedades</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-name">Usuario Actual</div>
+                <div class="user-role">Administrador</div>
+            </div>
+            <a href="{% url 'perfil_usuario' %}" class="nav-item">
+                <i class="fas fa-user"></i> <span>Mi Perfil</span>
+            </a>
+            <a href="{% url 'logout' %}" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+            </a>
+        </div>
+    </nav>
+    
+    <!-- Contenido Principal -->
+    <main class="main-content" id="mainContent">
+        <div class="content-header">
+            <h1 class="page-title">
+                <i class="fas fa-gift"></i> Gestión de Sorteos
+            </h1>
+        </div>
+
+        <div class="content-body">
+            <!-- Botones principales -->
+            <div class="text-center my-3 d-flex flex-column flex-md-row justify-content-center gap-2">
+                <button class="btn-modern w-100 w-md-auto" data-bs-toggle="modal" data-bs-target="#crearSorteoModal">
+                    <i class="fas fa-plus"></i> Nuevo Sorteo
+                </button>
+
+                <form method="post" onsubmit="return confirm('¿Liberar TODOS los parqueaderos de propietarios?');" class="w-100 w-md-auto">
+                    {% csrf_token %}
+                    <button type="submit" name="liberar_propietarios" class="btn-black w-100 w-md-auto">
+                        <i class="fas fa-unlock"></i> Liberar Parqueaderos Propietarios
+                    </button>
+                </form>
+
+                <form method="post" onsubmit="return confirm('¿Liberar TODOS los parqueaderos de arrendatarios?');" class="w-100 w-md-auto">
+                    {% csrf_token %}
+                    <button type="submit" name="liberar_arrendatarios" class="btn-gray w-100 w-md-auto">
+                        <i class="fas fa-unlock"></i> Liberar Parqueaderos Arrendatarios
+                    </button>
+                </form>
+            </div>
+
+            <!-- MODAL Crear Sorteo -->
+            <div class="modal fade" id="crearSorteoModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="fas fa-edit"></i> Crear Sorteo</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form method="post">
+                            <div class="modal-body">
+                                {% csrf_token %}
+                                <div class="form-group mb-3">
+                                    <div class="form-check form-switch">
+                                        {{ form.tipo_residente_propietario }}
+                                        <label class="form-check-label" for="{{ form.tipo_residente_propietario.id_for_label }}">
+                                            {{ form.tipo_residente_propietario.label }}
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="{{ form.fecha_inicio.id_for_label }}" class="form-label">{{ form.fecha_inicio.label }}</label>
+                                    {{ form.fecha_inicio }}
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label for="{{ form.hora_sorteo.id_for_label }}" class="form-label">{{ form.hora_sorteo.label }}</label>
+                                    {{ form.hora_sorteo }}
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn-secondary-modern" data-bs-dismiss="modal">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </button>
+                                <button type="submit" name="crear_sorteo" class="btn-modern">
+                                    <i class="fas fa-check"></i> Guardar Sorteo
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Listado de Sorteos -->
+            {% if sorteos %}
+            <div class="table-modern">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID Sorteo</th>
+                            <th>Fecha Creado</th>
+                            <th>Tipo</th>
+                            <th>Fecha Inicio</th>
+                            <th>Hora Sorteo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sorteo in sorteos %}
+                        <tr>
+                            <td><strong>{{ sorteo.id_sorteo }}</strong></td>
+                            <td>{{ sorteo.fecha_creado|date:"d-m-Y H:i" }}</td>
+                            <td>
+                                <span class="role-badge {% if sorteo.tipo_residente_propietario %}badge-warning{% else %}btn-secondary-modern{% endif %}">
+                                    <i class="fas {% if sorteo.tipo_residente_propietario %}fa-user{% else %}fa-home{% endif %}"></i>
+                                    {% if sorteo.tipo_residente_propietario %}Propietario{% else %}Arrendatario{% endif %}
+                                </span>
+                            </td>
+                            <td>{{ sorteo.fecha_inicio|date:"d-m-Y" }}</td>
+                            <td>{{ sorteo.hora_sorteo|time:"H:i" }}</td>
+                            <td>
+                                <a href="{% url 'sorteo_vehiculos' sorteo.id_sorteo %}" class="btn-modern">
+                                    <i class="fas fa-eye"></i> Hacer sorteo
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-gift"></i>
+                    <div>No hay sorteos creados.</div>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/administrador/sorteo/sorteos.js' %}"></script>
+
+</body>
+</html>

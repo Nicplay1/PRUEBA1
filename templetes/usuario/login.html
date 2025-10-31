@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Altos de Fontibón</title>
+  <link rel="stylesheet" href="{% static 'css/usuario/login.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Imagen izquierda -->
+    <div class="image-side">
+      <img src="{% static 'IMG/imagen-login.png' %}" alt="Imagen referencial">
+    </div>
+
+    <!-- Formulario -->
+    <div class="form-side">
+      <div class="logo">
+        <img src="{% static 'IMG/Logo Fontibon.png' %}" alt="Altos de Fontibón" <a href="{% url 'index' %}"></a>
+        <h1>¡Fontibón Contigo!</h1>
+        <p>Conoce y gestiona todo sobre tu <br>próximo <b>apartamento</b>.</p>
+      </div>
+
+      <form method="POST">
+        {% csrf_token %}
+
+        <div class="alert_alert">
+          {% for message in messages %}
+        <div class="alert {{ message.tags }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="input-box">
+          <p style="margin-bottom: 2px; text-align: left; font-size: 14px; color:#026e59;">
+            Documento de Identidad <span style="color:red;">*</span>
+          </p>
+          {{ form.numero_documento }}
+          {% if form.numero_documento.errors %}
+            <div style="color: red; font-size: 13px;">
+              {{ form.numero_documento.errors.0 }}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="input-box">
+          <p style="margin-bottom: 2px; text-align: left; font-size: 14px; color:#026e59;">
+            Contraseña <span style="color:red;">*</span>
+          </p>
+          {{ form.contraseña }}
+          {% if form.contraseña.errors %}
+            <div class="error " style="color: red; font-size: 13px;">
+              {{ form.contraseña.errors.0 }}
+            </div>
+          {% endif %}
+        </div>
+
+      <script src="{% static 'js/usuario/login.js' %}"></script>
+
+
+        <div class="btn-box">
+        <button class="btn" type="submit">Ingresar</button>
+        <a href="{% url 'index' %}" class="redireccion">Ir al inicio</a>
+        </div>
+
+        <a href="{% url 'solicitar_reset' %}" class="forgot">¿Has olvidado tu contraseña?</a>
+      <div class="links">
+        <a href="#">Términos y condiciones</a> 
+        <a href="#">Política de privacidad</a>
+        <p class="current">¿No tienes cuenta? 
+        <a href="{% url 'register' %}">Regístrate</a>
+        </p>
+      </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

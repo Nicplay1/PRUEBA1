@@ -1,0 +1,166 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reservar Zona - Panel de Administrador</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/residente/zonas_comunes/crear_reserva.css' %}">
+    <!-- FullCalendar -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Alertas -->
+    {% if messages %}
+    <div class="alerts-container">
+        {% for message in messages %}
+            <div class="alert-modern alert-{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %} fade show" role="alert">
+                {% if message.tags == "success" %}
+                    <i class="fas fa-check-circle"></i>
+                {% elif message.tags == "error" %}
+                    <i class="fas fa-times-circle"></i>
+                {% else %}
+                    <i class="fas fa-info-circle"></i>
+                {% endif %}
+                <div>{{ message }}</div>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Botón móvil -->
+    <button class="mobile-toggle" id="toggleSidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Overlay para móvil -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <img src="{% static 'img/Logo Fontibon.png' %}" alt="Logo" class="logo-img">
+                <div class="logo-text">Panel Residente</div>
+            </div>
+        </div>
+
+        <div class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Navegación</div>
+
+                <a href="{% url 'panel_residente' %}" class="nav-item ">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </a>
+                <a href="{% url 'noticias' %}" class="nav-item ">
+                    <i class="fas fa-newspaper"></i>
+                    <span>Noticias</span>
+                </a>
+                <a href="{% url 'listar_zonas' %}" class="nav-item ">
+                    <i class="fas fa-building"></i>
+                    <span>Zonas</span>
+                </a>
+                <a href="{% url 'mis_reservas' %}" class="nav-item">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Reservas</span>
+                </a>
+                <a href="{% url 'lista_sorteos' %}" class="nav-item ">
+                    <i class="fas fa-ticket-alt"></i>
+                    <span>Sorteos</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-name">Usuario Actual</div>
+                <div class="user-role">Residente</div>
+            </div>
+            <a href="{% url 'perfil_usuario' %}" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Mi Perfil</span>
+            </a>
+            <a href="{% url 'logout' %}" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
+            </a>
+        </div>
+    </nav>
+    <!-- Contenido Principal -->
+    <main class="main-content" id="mainContent">
+        <div class="content-header">
+            <h1 class="page-title">
+                <i class="fas fa-calendar-alt"></i>
+                Reservar Zona: {{ zona.nombre_zona }}
+            </h1>
+        </div>
+
+        <div class="content-body">
+            <a href="{% url 'listar_zonas' %}" class="back-link">
+                <i class="fas fa-arrow-left me-2"></i>
+                Volver a Zonas
+            </a>
+
+            <!-- Formulario de reserva -->
+            <div class="card-modern mb-4">
+                <div class="card-header">
+                    <i class="fas fa-edit"></i> Detalles de la Reserva
+                </div>
+                <div class="card-body">
+                    <form method="post" class="space-y-4">
+                        {% csrf_token %}
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="form-group">
+                                {{ form.hora_inicio.label_tag }}
+                                {{ form.hora_inicio }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.hora_fin.label_tag }}
+                                {{ form.hora_fin }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.fecha_uso.label_tag }}
+                                {{ form.fecha_uso }}
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-modern mt-4">
+                            <i class="fas fa-calendar-check"></i> Reservar
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Calendario -->
+            <div class="card-modern">
+                <div class="card-header">
+                    <i class="fas fa-calendar"></i> Disponibilidad
+                </div>
+                <div class="card-body">
+                    <div id="calendar" class="w-full"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/es.min.js"></script>
+    
+    <script src="{% static 'js/residente/zonas_comunes/crear_reserva.js' %}"></script>
+
+</body>
+</html>

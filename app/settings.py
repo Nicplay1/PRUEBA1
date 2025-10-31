@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-pf7lx3f(rk7&qqs33&(#sfgg2-_d=g9f9g=bfw2e5gr59vhnrt'
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "ponga_un_valor_temporal_aqui")
+DEBUG = os.environ.get("DJANGO_DEBUG", "False") == "True"
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [os.environ.get("PA_DOMAIN", "NIcPlayB1.pythonanywhere.com")]
 
 
 # Application definition
@@ -82,12 +81,12 @@ WSGI_APPLICATION = 'app.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',  # Motor de base de datos
-        'NAME': 'proyecto_bd',                   # Nombre de la base de datos
-        'USER': 'root',                        # Usuario de MySQL
-        'PASSWORD': '',                        # Contraseña de MySQL
-        'HOST': 'localhost',                   # Servidor de base de datos
-        'PORT': '3306',                         # Puerto (3306 por defecto)
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('PA_DB_NAME', 'NIcPlayB1$proyecto_bd'),   # e.g. tuname$proyecto_bd
+        'USER': os.environ.get('PA_DB_USER', 'NIcPlayB1'),
+        'PASSWORD': os.environ.get('PA_DB_PASSWORD', ''),
+        'HOST': os.environ.get('PA_DB_HOST', 'NIcPlayB1.mysql.pythonanywhere-services.com'),
+        'PORT': '3306',
         'OPTIONS': {
             'charset': 'utf8mb4',
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
@@ -129,17 +128,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-import os
+
 
 # URL base para archivos estáticos
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR / "static"),
-]
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')   # collectstatic coloca aquí
+STATICFILES_DIRS = [ os.path.join(BASE_DIR, "static"), ]
 
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

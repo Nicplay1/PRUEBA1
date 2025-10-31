@@ -85,10 +85,10 @@ pymysql.install_as_MySQLdb()
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('PA_DB_NAME', 'NIcPlayB1$proyecto_bd'),   # e.g. tuname$proyecto_bd
-        'USER': os.environ.get('PA_DB_USER', 'NIcPlayB1'),
-        'PASSWORD': os.environ.get('PA_DB_PASSWORD', ''),
-        'HOST': os.environ.get('PA_DB_HOST', 'NIcPlayB1.mysql.pythonanywhere-services.com'),
+        'NAME': 'NIcPlayB1$proyecto_bd',
+        'USER': 'NIcPlayB1',
+        'PASSWORD': '77rS2XK6u_x3MME',
+        'HOST': 'NIcPlayB1.mysql.pythonanywhere-services.com',
         'PORT': '3306',
         'OPTIONS': {
             'charset': 'utf8mb4',
